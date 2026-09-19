@@ -1,22 +1,11 @@
-.bct-panel {
+.bct-own-row {
   display: flex;
-  gap: 8px;
-  margin: 8px 0 0;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding: 8px 0 0;
 }
 
 .bct-btn {
-  font: 13px/1.2 -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  padding: 6px 12px;
-  border: 1px solid #c9d3e0;
-  border-radius: 6px;
-  background: #fff;
-  color: #1c1c1a;
   cursor: pointer;
-}
-
-.bct-btn:hover {
-  background: #f1f4f8;
 }
 
 .bct-btn:disabled {
@@ -24,23 +13,8 @@
   cursor: default;
 }
 
-.bct-btn-main {
-  background: #1f4f8f;
-  border-color: #1f4f8f;
-  color: #fff;
-}
-
-.bct-btn-main:hover {
-  background: #1a4479;
-}
-
-.bct-link {
-  font: 13px/1.2 -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  align-self: center;
-  color: #1f4f8f;
-  text-decoration: underline;
-}
-
-.bct-link:hover {
-  color: #14355f;
+a.bct-btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
