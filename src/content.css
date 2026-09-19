@@ -1,6 +1,6 @@
 .bct-own-row {
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-end;
   padding: 8px 0 0;
 }
 
@@ -11,10 +11,4 @@
 .bct-btn:disabled {
   opacity: 0.6;
   cursor: default;
-}
-
-a.bct-btn {
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
 }

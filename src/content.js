@@ -4,8 +4,8 @@ const PANEL_MARK = "data-bct-panel";
 const BTN_CLASS = "ui-btn --air ui-btn-md ui-btn-no-caps ui-btn-round";
 const CARD = ".crm-timeline__card";
 const ACTION_ROW = ".crm-timeline__card-action";
-const ACTION_BUTTONS = ".crm-timeline__card-action_buttons";
-const ACTION_BTN_WRAP = "crm-timeline__card-action-btn";
+const ACTION_MENU = ".crm-timeline__card-action_menu";
+const MENU_ITEM = "crm-timeline__card-action_menu-item";
 
 const observer = new MutationObserver(() => scan());
 observer.observe(document.documentElement, { childList: true, subtree: true });
@@ -19,14 +19,14 @@ function scan() {
     const card = media.closest(CARD) || fallbackCard(media);
     if (!card || card.hasAttribute(PANEL_MARK)) continue;
 
-    const row = buttonRow(card);
-    if (!row) continue;
+    const menu = menuOf(card);
+    if (!menu) continue;
 
     card.setAttribute(PANEL_MARK, "1");
     const info = callInfo(card);
-    const first = row.firstChild;
+    const first = menu.firstChild;
     for (const node of controls(src, info)) {
-      row.insertBefore(node, first);
+      menu.insertBefore(node, first);
     }
   }
 }
@@ -40,23 +40,24 @@ function fallbackCard(media) {
   return media.parentElement;
 }
 
-function buttonRow(card) {
-  const existing = card.querySelector(ACTION_BUTTONS);
+function menuOf(card) {
+  const existing = card.querySelector(ACTION_MENU);
   if (existing) return existing;
 
+  const menu = document.createElement("div");
+  menu.className = "crm-timeline__card-action_menu";
+
   const actions = card.querySelector(ACTION_ROW);
-  const row = document.createElement("div");
-  row.className = "crm-timeline__card-action_buttons";
   if (actions) {
-    actions.append(row);
-    return row;
+    actions.prepend(menu);
+    return menu;
   }
 
   const own = document.createElement("div");
   own.className = "crm-timeline__card-action bct-own-row";
-  own.append(row);
+  own.append(menu);
   card.append(own);
-  return row;
+  return menu;
 }
 
 function controls(src, info) {
@@ -74,24 +75,14 @@ function controls(src, info) {
     setTimeout(() => (btn.textContent = label), 2500);
   });
 
-  const link = document.createElement("div");
-  link.className = ACTION_BTN_WRAP;
-  const anchor = document.createElement("a");
-  anchor.className = BTN_CLASS + " --style-plain bct-btn";
-  anchor.href = src;
-  anchor.target = "_blank";
-  anchor.rel = "noopener";
-  anchor.download = fileName(info).split("/").pop();
-  anchor.textContent = "Ссылка";
-  anchor.title = "Открыть файл записи: сохранить правой кнопкой или скопировать адрес";
-  link.append(anchor);
+  save.querySelector("button").title = "Сохранить mp3. Сам файл лежит по адресу " + src;
 
-  return [transcribe, save, link];
+  return [transcribe, save];
 }
 
 function button(text, style, onClick) {
   const wrap = document.createElement("div");
-  wrap.className = ACTION_BTN_WRAP;
+  wrap.className = MENU_ITEM;
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = BTN_CLASS + " " + style + " bct-btn";
