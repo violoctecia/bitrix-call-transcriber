@@ -101,9 +101,9 @@ function controls(src, info) {
 
 const ICONS = {
   transcribe:
-    '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 2.75h7.5L13 5.25v8a.75.75 0 0 1-.75.75h-8.5a.75.75 0 0 1-.75-.75v-10.5A.75.75 0 0 1 3 2.75Z"/><path d="M5.5 7.5h5M5.5 10h3.5"/></svg>',
+    '<svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 5.5h12M4 10h12M4 14.5h7"/></svg>',
   download:
-    '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5v7.5"/><path d="M4.75 7.25 8 10.5l3.25-3.25"/><path d="M3 12.5h10"/></svg>',
+    '<svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3v9"/><path d="M6 8.5 10 12.5l4-4"/><path d="M4 16.5h12"/></svg>',
 };
 
 function button(text, style, icon, onClick) {
@@ -113,8 +113,15 @@ function button(text, style, icon, onClick) {
   btn.type = "button";
   btn.className = BTN_CLASS + " " + style + " bct-btn";
 
+  btn.style.display = "inline-flex";
+  btn.style.alignItems = "center";
+  btn.style.gap = "7px";
+
   const glyph = document.createElement("span");
   glyph.className = "bct-icon";
+  glyph.style.display = "inline-flex";
+  glyph.style.flex = "none";
+  glyph.style.opacity = "0.9";
   glyph.innerHTML = ICONS[icon];
 
   const label = document.createElement("span");
