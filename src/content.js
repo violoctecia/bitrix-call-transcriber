@@ -7,9 +7,24 @@ const ACTION_ROW = ".crm-timeline__card-action";
 const ACTION_MENU = ".crm-timeline__card-action_menu";
 const MENU_ITEM = "crm-timeline__card-action_menu-item";
 
-const observer = new MutationObserver(() => scan());
+const LOG = "[расшифровка звонков]";
+
+let planned = 0;
+let found = 0;
+
+console.info(LOG, "скрипт загружен:", location.pathname);
+
+const observer = new MutationObserver(plan);
 observer.observe(document.documentElement, { childList: true, subtree: true });
-scan();
+plan();
+
+function plan() {
+  if (planned) return;
+  planned = setTimeout(() => {
+    planned = 0;
+    scan();
+  }, 300);
+}
 
 function scan() {
   for (const media of document.querySelectorAll("audio, video")) {
@@ -17,7 +32,8 @@ function scan() {
     if (!src.includes(FILE_MARK)) continue;
 
     const card = media.closest(CARD) || fallbackCard(media);
-    if (!card || card.hasAttribute(PANEL_MARK)) continue;
+    if (!card) continue;
+    if (card.querySelector(".bct-item")) continue;
 
     const menu = menuOf(card);
     if (!menu) continue;
@@ -28,6 +44,8 @@ function scan() {
     for (const node of controls(src, info)) {
       menu.insertBefore(node, first);
     }
+    found++;
+    console.info(LOG, "кнопки добавлены к записи", found);
   }
 }
 
