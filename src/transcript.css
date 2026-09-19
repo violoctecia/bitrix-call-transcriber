@@ -1,0 +1,104 @@
+:root { color-scheme: light; }
+
+body {
+  margin: 0;
+  font: 15px/1.5 -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background: #f6f6f4;
+  color: #1c1c1a;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #fff;
+  border-bottom: 1px solid #e3e3df;
+  padding: 12px 16px;
+}
+
+h1 { margin: 0 0 6px; font-size: 17px; }
+.hint { color: #6b6b64; font-size: 13px; margin-bottom: 8px; }
+audio { width: 100%; margin-bottom: 10px; }
+
+.meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 6px;
+}
+.meta label { display: flex; flex-direction: column; font-size: 12px; color: #6b6b64; }
+.meta input {
+  font: inherit;
+  padding: 5px 7px;
+  border: 1px solid #d8d8d2;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+button {
+  font: inherit;
+  padding: 6px 12px;
+  border: 1px solid #d8d8d2;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+button:hover { background: #f0f0ec; }
+button.primary { background: #1f4f8f; color: #fff; border-color: #1f4f8f; }
+.saved { font-size: 12px; color: #6b6b64; align-self: center; }
+
+main { padding: 12px 16px 80px; max-width: 900px; }
+
+.error {
+  background: #fff1f0;
+  border: 1px solid #f0c8c4;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.error p { margin: 0 0 10px; }
+
+.progress { margin-bottom: 14px; }
+.bar { height: 6px; background: #e6e6e1; border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: #1f4f8f; transition: width 0.3s; }
+#progress-text { font-size: 13px; color: #6b6b64; margin-top: 6px; }
+
+.line {
+  display: grid;
+  grid-template-columns: 56px 44px 1fr auto;
+  gap: 8px;
+  align-items: start;
+  padding: 5px 6px;
+  border-radius: 8px;
+}
+.line.now { background: #fff5d6; }
+
+.time {
+  color: #8a8a80;
+  font-size: 12px;
+  padding-top: 5px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.time:hover { color: #1c1c1a; text-decoration: underline; }
+
+.role { font-weight: 600; padding: 4px 0; }
+.role.op { background: #e4efff; border-color: #b8d3f5; }
+.role.cl { background: #e8f6e8; border-color: #bfe2bf; }
+
+.text {
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid #e3e3df;
+  border-radius: 6px;
+  min-height: 22px;
+}
+.text:focus { outline: 2px solid #9cc2f0; }
+
+.act { opacity: 0; display: flex; gap: 4px; padding-top: 2px; }
+.line:hover .act { opacity: 1; }
+.act button { padding: 2px 7px; font-size: 12px; }
+
+@media (max-width: 640px) {
+  .line { grid-template-columns: 48px 40px 1fr; }
+  .act { grid-column: 1 / -1; opacity: 1; }
+}

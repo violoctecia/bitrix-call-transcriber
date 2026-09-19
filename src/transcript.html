@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Расшифровка звонка</title>
+  <link rel="stylesheet" href="transcript.css">
+</head>
+<body>
+  <header>
+    <h1 id="title">Расшифровка звонка</h1>
+    <div class="hint" id="hint">Готовлю запись…</div>
+    <audio id="audio" controls preload="metadata" hidden></audio>
+
+    <div class="meta" id="meta" hidden>
+      <label>Дата и время<input id="m-date" placeholder="12.09 14:30"></label>
+      <label>Город<input id="m-city" placeholder="Хабаровск"></label>
+      <label>Источник<input id="m-src" placeholder="Авито"></label>
+      <label>Направление<input id="m-dir" placeholder="входящий"></label>
+      <label>Итог<input id="m-res" placeholder="записались на замер"></label>
+      <label>Чем интересен<input id="m-note" placeholder="упирался в цену"></label>
+    </div>
+
+    <div class="tools" id="tools" hidden>
+      <button id="swap">Поменять роли</button>
+      <button id="copy">Скопировать</button>
+      <button class="primary" id="save">Скачать txt</button>
+      <span class="saved" id="saved"></span>
+    </div>
+  </header>
+
+  <main>
+    <div id="error" class="error" hidden>
+      <p id="error-text"></p>
+      <button id="open-options">Открыть настройки</button>
+    </div>
+    <div id="progress" class="progress" hidden>
+      <div class="bar"><i id="bar-fill"></i></div>
+      <div id="progress-text"></div>
+    </div>
+    <div id="lines"></div>
+  </main>
+
+  <script type="module" src="transcript.js"></script>
+</body>
+</html>

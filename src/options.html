@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Настройки расшифровки звонков</title>
+  <link rel="stylesheet" href="transcript.css">
+</head>
+<body>
+  <header>
+    <h1>Ключ Yandex SpeechKit</h1>
+    <div class="hint">Скачивание записей работает без ключа. Ключ нужен только для расшифровки — распознавание платное и идёт с вашего счёта в Яндекс.Облаке.</div>
+  </header>
+  <main>
+    <div class="meta">
+      <label>API-ключ сервисного аккаунта<input id="apiKey" type="password" placeholder="AQVN..." autocomplete="off"></label>
+      <label>Идентификатор каталога (folder id)<input id="folderId" placeholder="b1g..."></label>
+      <label>Язык распознавания<input id="lang" placeholder="ru-RU"></label>
+    </div>
+    <div class="tools">
+      <button class="primary" id="save">Сохранить</button>
+      <button id="clear">Стереть ключ</button>
+      <span class="saved" id="saved"></span>
+    </div>
+
+    <h2 style="font-size:15px;margin-top:28px">Где взять ключ</h2>
+    <ol style="color:#4a4a44;font-size:14px">
+      <li>Зайдите в консоль Яндекс.Облака и создайте сервисный аккаунт.</li>
+      <li>Выдайте ему роль <code>ai.speechkit-stt.user</code>.</li>
+      <li>Создайте для него API-ключ и вставьте сюда целиком.</li>
+      <li>Идентификатор каталога — строка вида <code>b1g…</code> в адресе консоли или на странице каталога.</li>
+    </ol>
+    <p style="color:#6b6b64;font-size:13px">Ключ хранится только в вашем браузере и никуда, кроме api.cloud.yandex.net, не отправляется.</p>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>
