@@ -49,7 +49,16 @@ function panel(src, host) {
   text.textContent = "Расшифровать";
   text.onclick = () => ask({ type: "transcribe", url: src, info });
 
-  box.append(save, text);
+  const direct = document.createElement("a");
+  direct.className = "bct-link";
+  direct.href = src;
+  direct.target = "_blank";
+  direct.rel = "noopener";
+  direct.download = fileName(info).split("/").pop();
+  direct.textContent = "Прямая ссылка";
+  direct.title = "Открыть файл записи — можно сохранить правой кнопкой или скопировать адрес";
+
+  box.append(save, text, direct);
   return box;
 }
 
