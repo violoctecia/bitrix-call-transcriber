@@ -189,6 +189,14 @@ function render() {
       save();
     };
     text.onfocus = () => mark(i);
+    // Меню появляется по клику и по перемещению курсора с клавиатуры: человек
+    // ставит курсор туда, где кончилась одна реплика и началась другая.
+    text.onclick = () => showBubble(text, i);
+    text.onkeyup = (e) => {
+      if (e.key === "Escape") return hideBubble();
+      showBubble(text, i);
+    };
+    text.onblur = () => setTimeout(hideBubble, 150);
     body.append(text);
 
     // Второе поле у реплик клиента: слева остаётся то, что услышало
@@ -263,6 +271,100 @@ function insertAfter(index) {
   save();
   const line = el.lines.querySelector(`.line[data-i="${index + 1}"] .text`);
   if (line) line.focus();
+}
+
+// Всплывающее меню в реплике.
+//
+// Пока действие одно — разделить строку по курсору. Распознавание сплошным
+// потоком склеивает две реплики подряд («да актуально а сколько стоит» —
+// это уже другой человек), и резать их приходится постоянно. Меню, а не
+// кнопка в строке: место разреза человек показывает курсором, и действие
+// должно стоять там же, а не в стороне.
+const bubble = document.createElement("div");
+bubble.className = "bubble";
+bubble.hidden = true;
+document.body.append(bubble);
+
+const splitButton = document.createElement("button");
+splitButton.type = "button";
+splitButton.textContent = "Разделить здесь";
+splitButton.title = "Перенести всё после курсора в следующую реплику";
+bubble.append(splitButton);
+
+let bubbleAt = null;
+
+function showBubble(node, index) {
+  const at = caretOffset(node);
+  // В начале и в конце резать нечего: одна из половин будет пустой.
+  if (at === null || at === 0 || at >= node.textContent.length) return hideBubble();
+
+  bubbleAt = { index, at };
+  bubble.hidden = false;
+
+  const rect = caretRect(node);
+  const box = bubble.getBoundingClientRect();
+  const left = Math.max(8, Math.min(rect.left - box.width / 2, window.innerWidth - box.width - 8));
+  bubble.style.left = left + "px";
+  bubble.style.top = Math.max(8, rect.top - box.height - 8) + "px";
+}
+
+function hideBubble() {
+  bubble.hidden = true;
+  bubbleAt = null;
+}
+
+splitButton.onmousedown = (e) => {
+  // mousedown, а не click: click приходит уже после blur поля, и к этому
+  // моменту курсор потерян вместе с местом разреза.
+  e.preventDefault();
+  if (!bubbleAt) return;
+  splitRow(bubbleAt.index, bubbleAt.at);
+  hideBubble();
+};
+
+document.addEventListener("scroll", hideBubble, true);
+
+// caretOffset — сколько символов до курсора от начала реплики.
+function caretOffset(node) {
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) return null;
+  const range = selection.getRangeAt(0);
+  if (!node.contains(range.startContainer)) return null;
+  const before = range.cloneRange();
+  before.selectNodeContents(node);
+  before.setEnd(range.startContainer, range.startOffset);
+  return before.toString().length;
+}
+
+// caretRect — где курсор на экране. У схлопнутого выделения свой прямоугольник
+// бывает пустым, поэтому в этом случае меряем сам элемент.
+function caretRect(node) {
+  const selection = window.getSelection();
+  const range = selection && selection.rangeCount ? selection.getRangeAt(0) : null;
+  const rect = range ? range.getBoundingClientRect() : null;
+  if (rect && (rect.width || rect.height)) return rect;
+  return node.getBoundingClientRect();
+}
+
+function splitRow(index, at) {
+  const row = rows[index];
+  if (!row) return;
+  const head = row.text.slice(0, at).trim();
+  const tail = row.text.slice(at).trim();
+  if (!head || !tail) return;
+
+  row.text = head;
+  rows.splice(index + 1, 0, {
+    start: row.start,
+    // Режут обычно там, где распознавание склеило двух собеседников, поэтому
+    // вторая половина по умолчанию достаётся другому. Роль переключается
+    // кнопкой, если догадка не подошла.
+    role: row.role === "К" ? "О" : "К",
+    text: tail,
+    real: "",
+  });
+  render();
+  save();
 }
 
 el.audio.ontimeupdate = () => {
