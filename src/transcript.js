@@ -50,6 +50,25 @@ document.getElementById("save").onclick = () => {
   a.download = (info.entityId ? "lead-" + info.entityId : "call") + ".txt";
   a.click();
 };
+// Выгрузка пар «услышано — сказано»: расшифровка нужна людям, а это —
+// материал для настройки распознавания, и смешивать их в одном файле незачем.
+document.getElementById("pairs").onclick = () => {
+  const pairs = rows
+    .filter((r) => (r.real || "").trim() && r.real.trim() !== (r.text || "").trim())
+    .map((r) => ({ at: r.start, role: r.role || "?", heard: r.text.trim(), said: r.real.trim() }));
+  if (!pairs.length) {
+    flash("нечего выгружать: правок по услышанному нет");
+    return;
+  }
+  const blob = new Blob([JSON.stringify({ call: storeKey, pairs }, null, 1)], {
+    type: "application/json;charset=utf-8",
+  });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = (info.entityId ? "lead-" + info.entityId : "call") + "-stt.json";
+  a.click();
+};
+
 metaFields.forEach((k) => (document.getElementById("m-" + k).oninput = save));
 
 start();
@@ -157,15 +176,40 @@ function render() {
       save();
     };
 
+    const body = document.createElement("div");
+    body.className = "body";
+
     const text = document.createElement("div");
     text.className = "text";
     text.contentEditable = "true";
     text.textContent = r.text;
+    text.title = "Как услышало распознавание";
     text.oninput = () => {
       r.text = text.textContent;
       save();
     };
     text.onfocus = () => mark(i);
+    body.append(text);
+
+    // Второе поле у реплик клиента: слева остаётся то, что услышало
+    // распознавание, справа человек пишет, что было сказано на самом деле.
+    // Пара «услышано — сказано» нужна не расшифровке, а нам: по ней видно,
+    // на каких словах распознавание врёт, и её можно скормить настройке STT.
+    if (r.role === "К") {
+      const real = document.createElement("div");
+      real.className = "real" + (r.real ? " filled" : "");
+      real.contentEditable = "true";
+      real.dataset.placeholder = "как сказал на самом деле";
+      real.textContent = r.real || "";
+      real.title = "Как человек сказал на самом деле";
+      real.oninput = () => {
+        r.real = real.textContent.trim();
+        real.classList.toggle("filled", Boolean(r.real));
+        save();
+      };
+      real.onfocus = () => mark(i);
+      body.append(real);
+    }
 
     const act = document.createElement("div");
     act.className = "act";
@@ -175,10 +219,15 @@ function render() {
     up.onclick = () => {
       if (i === 0) return;
       rows[i - 1].text = (rows[i - 1].text + " " + r.text).trim();
+      if (r.real) rows[i - 1].real = ((rows[i - 1].real || "") + " " + r.real).trim();
       rows.splice(i, 1);
       render();
       save();
     };
+    const add = document.createElement("button");
+    add.textContent = "+ реплика";
+    add.title = "Добавить реплику после этой: распознавание пропускает тихие и короткие";
+    add.onclick = () => insertAfter(i);
     const del = document.createElement("button");
     del.textContent = "убрать";
     del.onclick = () => {
@@ -186,11 +235,34 @@ function render() {
       render();
       save();
     };
-    act.append(up, del);
+    act.append(up, add, del);
 
-    line.append(time, role, text, act);
+    line.append(time, role, body, act);
     el.lines.append(line);
   });
+
+  // Кнопка в конце: распознавание часто теряет последние слова — прощание,
+  // «до свидания» вдогонку, — и дописать их иначе некуда.
+  const tail = document.createElement("button");
+  tail.className = "add-tail";
+  tail.textContent = "+ реплика в конец";
+  tail.onclick = () => insertAfter(rows.length - 1);
+  el.lines.append(tail);
+}
+
+// insertAfter — новая пустая реплика после указанной.
+//
+// Роль ставится противоположная соседней, время берётся от неё же: строки
+// держатся временем, и без него новая уехала бы в начало разговора.
+function insertAfter(index) {
+  const near = rows[index];
+  const role = near ? (near.role === "К" ? "О" : "К") : "К";
+  const start = near ? near.start : 0;
+  rows.splice(index + 1, 0, { start, role, text: "", real: "" });
+  render();
+  save();
+  const line = el.lines.querySelector(`.line[data-i="${index + 1}"] .text`);
+  if (line) line.focus();
 }
 
 el.audio.ontimeupdate = () => {
@@ -217,7 +289,14 @@ function asText() {
     "Итог: " + v("res"),
     "",
   ].join("\n");
-  const body = rows.map((r) => (r.role || "?") + ": " + r.text).join("\n");
+  const body = rows
+    .map((r) => {
+      const said = (r.real || "").trim();
+      const heard = (r.text || "").trim();
+      if (said && said !== heard) return `${r.role || "?"}: ${said}\n   [распознано: ${heard}]`;
+      return `${r.role || "?"}: ${heard}`;
+    })
+    .join("\n");
   return head + body + "\n\nЧем интересен: " + v("note") + "\n";
 }
 

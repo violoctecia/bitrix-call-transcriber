@@ -102,3 +102,37 @@ main { padding: 12px 16px 80px; max-width: 900px; }
   .line { grid-template-columns: 48px 40px 1fr; }
   .act { grid-column: 1 / -1; opacity: 1; }
 }
+
+.body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.real {
+  padding: 4px 8px;
+  background: #fffdf5;
+  border: 1px dashed #e3d9b8;
+  border-radius: 6px;
+  min-height: 22px;
+  font-size: 14px;
+}
+
+.real.filled {
+  background: #fff8e2;
+  border-style: solid;
+}
+
+.real:empty::before {
+  content: attr(data-placeholder);
+  color: #a8a89c;
+}
+
+.real:focus {
+  outline: 2px solid #e0c56a;
+}
+
+.add-tail {
+  margin-top: 8px;
+  font-size: 13px;
+}
