@@ -61,18 +61,19 @@ function menuOf(card) {
 }
 
 function controls(src, info) {
-  const transcribe = button("Расшифровать", "--style-filled", () =>
+  const transcribe = button("Расшифровать", "--style-filled", "transcribe", () =>
     ask({ type: "transcribe", url: src, info })
   );
 
-  const save = button("Скачать", "--style-outline", async (btn) => {
-    const label = btn.textContent;
+  const save = button("Скачать", "--style-outline", "download", async (btn) => {
+    const label = btn.querySelector(".bct-label");
+    const was = label.textContent;
     btn.disabled = true;
-    btn.textContent = "Скачиваю…";
+    label.textContent = "Скачиваю…";
     const answer = await ask({ type: "download", url: src, name: fileName(info) });
     btn.disabled = false;
-    btn.textContent = answer && answer.ok ? "Скачано" : "Не вышло";
-    setTimeout(() => (btn.textContent = label), 2500);
+    label.textContent = answer && answer.ok ? "Скачано" : "Не вышло";
+    setTimeout(() => (label.textContent = was), 2500);
   });
 
   save.querySelector("button").title = "Сохранить mp3. Сам файл лежит по адресу " + src;
@@ -80,13 +81,29 @@ function controls(src, info) {
   return [transcribe, save];
 }
 
-function button(text, style, onClick) {
+const ICONS = {
+  transcribe:
+    '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 2.75h7.5L13 5.25v8a.75.75 0 0 1-.75.75h-8.5a.75.75 0 0 1-.75-.75v-10.5A.75.75 0 0 1 3 2.75Z"/><path d="M5.5 7.5h5M5.5 10h3.5"/></svg>',
+  download:
+    '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5v7.5"/><path d="M4.75 7.25 8 10.5l3.25-3.25"/><path d="M3 12.5h10"/></svg>',
+};
+
+function button(text, style, icon, onClick) {
   const wrap = document.createElement("div");
-  wrap.className = MENU_ITEM;
+  wrap.className = MENU_ITEM + " bct-item";
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = BTN_CLASS + " " + style + " bct-btn";
-  btn.textContent = text;
+
+  const glyph = document.createElement("span");
+  glyph.className = "bct-icon";
+  glyph.innerHTML = ICONS[icon];
+
+  const label = document.createElement("span");
+  label.className = "bct-label";
+  label.textContent = text;
+
+  btn.append(glyph, label);
   btn.onclick = () => onClick(btn);
   wrap.append(btn);
   return wrap;

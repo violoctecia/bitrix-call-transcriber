@@ -4,11 +4,24 @@
   padding: 8px 0 0;
 }
 
+.bct-item {
+  margin-right: 6px;
+}
+
 .bct-btn {
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .bct-btn:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+.bct-icon {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
 }
